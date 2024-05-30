@@ -21,6 +21,7 @@ const {
   deleteLunch,
   deleteSnakes,
   deleteDinner,
+  updateGoal,
 } = require("../controllers/user-controller");
 const router = express.Router();
 router.use(cors());
@@ -45,4 +46,5 @@ router.delete("/deleteBreakfast", deleteBreakfast);
 router.delete("/deleteLunch", deleteLunch);
 router.delete("/deleteSnakes", deleteSnakes);
 router.delete("/deleteDinner", deleteDinner);
+router.put("/updateGoal", updateGoal);
 module.exports = router;

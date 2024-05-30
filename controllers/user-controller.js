@@ -45,24 +45,25 @@ const login = async (req, res, next) => {
   const { username, password } = req.body;
   try {
     const dbRes = await User.find({ email: username });
-    if (!dbRes?.length) {
-      return res.status(404).json({ message: "No users found..please signup" });
-    }
-    const isPasswordValid = await bcrypt.compare(password, dbRes[0].password);
-    if (!isPasswordValid) {
-      return res.json({ message: "Invalid password" });
-    }
+    if (dbRes?.length) {
+      const isPasswordValid = await bcrypt.compare(password, dbRes[0].password);
+      if (!isPasswordValid) {
+        return res.json({ message: "Invalid password" });
+      }
 
-    const token = jwt.sign({ id: dbRes[0]?._id }, data.parsed.JWT, {
-      expiresIn: "9999 years",
-    });
-    res.json({
-      message: "Successfully LoggedIn",
-      dbRes,
-      username: dbRes[0].email,
-      name: dbRes[0].username,
-      token,
-    });
+      const token = jwt.sign({ id: dbRes[0]?._id }, data.parsed.JWT, {
+        expiresIn: "9999 years",
+      });
+      res.json({
+        message: "Successfully LoggedIn",
+        dbRes,
+        username: dbRes[0].email,
+        name: dbRes[0].username,
+        token,
+      });
+    } else {
+      res.send("No User Found,please Sign Up");
+    }
   } catch (error) {
     console.log("error");
   }
@@ -290,7 +291,7 @@ const getLunch = async (req, res) => {
 };
 
 //get Snakes
-const getSnakes= async (req, res) => {
+const getSnakes = async (req, res) => {
   try {
     const response = await snakesModel.find({ user: req.user.id });
     if (response) {
@@ -359,6 +360,26 @@ const deleteDinner = async (req, res) => {
   }
 };
 
+//delete goal
+
+const updateGoal = async (req, res, next) => {
+  const { radioGroup, age, height, weight, genderGroup } = req.body;
+  const response = await Goal.findOneAndUpdate(
+    { user: req.user.id },
+    {
+      user: req.user.id,
+      goal: radioGroup,
+      age,
+      height,
+      weight,
+      gender: genderGroup,
+    }
+  );
+  if (response) {
+    res.send("Goal Added");
+  }
+};
+
 exports.signUp = signUp;
 exports.login = login;
 exports.goal = goal;
@@ -379,3 +400,4 @@ exports.deleteSnakes = deleteSnakes;
 exports.deleteDinner = deleteDinner;
 exports.getSnakes = getSnakes;
 exports.getDinner = getDinner;
+exports.updateGoal = updateGoal;
